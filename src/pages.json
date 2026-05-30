@@ -2,13 +2,12 @@
     "easycom": { "autoscan": true, "custom": { "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue" } },
     "pages": [
         { "path": "pages/home/index", "style": { "navigationStyle": "custom" } },
-        { "path": "pages/chats/index", "style": { "navigationBarTitleText": "消息" } },
-        { "path": "pages/mine/index", "style": { "navigationStyle": "custom" } },
-        { "path": "pages/login/index", "style": { "navigationBarTitleText": "登录" } }
+        { "path": "pages/chats/index", "style": { "navigationStyle": "custom" } },
+        { "path": "pages/mine/index", "style": { "navigationStyle": "custom" } }
     ],
     "globalStyle": {
         "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "互联网医院",
+        "navigationBarTitleText": "向内倾听",
         "navigationBarBackgroundColor": "#F8F8F8",
         "backgroundColor": "#F8F8F8"
     },
