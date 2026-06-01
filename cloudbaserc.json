@@ -1,0 +1,18 @@
+{
+    "envId": "listen-inward-d9gu8craaab975d29",
+    "functionRoot": "cloudfunctions",
+    "functions": [
+        {
+            "name": "wechat_api",
+            "timeout": 60,
+            "memorySize": 256,
+            "envVariables": {
+                "APPID": "wx86f3440cbe3f4919"
+            }
+        },
+        {
+            "name": "wechat_init",
+            "timeout": 30
+        }
+    ]
+}

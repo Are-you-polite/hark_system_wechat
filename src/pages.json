@@ -1,23 +1,35 @@
 {
     "easycom": { "autoscan": true, "custom": { "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue" } },
-    "pages": [
-        { "path": "pages/home/index", "style": { "navigationStyle": "custom" } },
-        { "path": "pages/chats/index", "style": { "navigationStyle": "custom" } },
-        { "path": "pages/mine/index", "style": { "navigationStyle": "custom" } }
+    "pages": [{ "path": "pages/tabbar/index", "style": { "navigationStyle": "custom" } }],
+    "subPackages": [
+        {
+            "root": "pages/test",
+            "pages": [
+                { "path": "answer", "style": { "navigationStyle": "custom" } },
+                { "path": "report", "style": { "navigationStyle": "custom" } }
+            ]
+        },
+        {
+            "root": "pages/chat",
+            "pages": [{ "path": "detail", "style": { "navigationStyle": "custom", "disableScroll": true } }]
+        },
+        {
+            "root": "pages/match",
+            "pages": [{ "path": "result", "style": { "navigationStyle": "custom" } }]
+        },
+        {
+            "root": "pages/member",
+            "pages": [
+                { "path": "center", "style": { "navigationStyle": "custom" } },
+                { "path": "subscribe", "style": { "navigationStyle": "custom" } },
+                { "path": "orders", "style": { "navigationStyle": "custom" } }
+            ]
+        }
     ],
     "globalStyle": {
         "navigationBarTextStyle": "black",
         "navigationBarTitleText": "向内倾听",
         "navigationBarBackgroundColor": "#F8F8F8",
         "backgroundColor": "#F8F8F8"
-    },
-    "tabBar": {
-        "color": "#6F6F6F",
-        "selectedColor": "#6F6F6F",
-        "list": [
-            { "text": "首页", "pagePath": "pages/home/index", "iconPath": "static/tabbar/global.png", "selectedIconPath": "static/tabbar/global_.png" },
-            { "text": "消息", "pagePath": "pages/chats/index", "iconPath": "static/tabbar/global.png", "selectedIconPath": "static/tabbar/global_.png" },
-            { "text": "我的", "pagePath": "pages/mine/index", "iconPath": "static/tabbar/global.png", "selectedIconPath": "static/tabbar/global_.png" }
-        ]
     }
 }

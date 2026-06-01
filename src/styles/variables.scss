@@ -1,0 +1,27 @@
+// === 颜色系统 ===
+$color-primary:    #1e3322;
+$color-secondary:  #6b7b6b;
+$color-muted:      #808a80;
+$color-accent:     #2d6b3f;
+$color-accent-dark:#235a33;
+$color-surface:    #ffffff;
+$color-surface-secondary: #f4f5f5;
+$color-border:     #e5e8e5;
+$color-bg:         #fafafa;
+
+// === 圆角 ===
+$radius-sm: 12rpx;
+$radius-md: 16rpx;
+$radius-lg: 24rpx;
+$radius-xl: 32rpx;
+
+// === 间距（8rpx 倍数） ===
+$spacing-xs: 8rpx;
+$spacing-sm: 16rpx;
+$spacing-md: 24rpx;
+$spacing-lg: 32rpx;
+$spacing-xl: 40rpx;
+
+// === 阴影 ===
+$shadow-card: 0 8rpx 32rpx rgba(30, 51, 34, 0.06);
+$shadow-btn: 0 8rpx 24rpx rgba(45, 107, 63, 0.25);

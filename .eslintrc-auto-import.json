@@ -105,6 +105,14 @@
     "watch": true,
     "watchEffect": true,
     "watchPostEffect": true,
-    "watchSyncEffect": true
+    "watchSyncEffect": true,
+    "formatTime": true,
+    "request": true,
+    "useChat": true,
+    "useCredits": true,
+    "useRewardedAd": true,
+    "useShare": true,
+    "useTest": true,
+    "useUser": true
   }
 }
