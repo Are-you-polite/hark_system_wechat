@@ -9,7 +9,7 @@
 
         <scroll-view scroll-y class="scroll-area">
             <view v-if="chatList.length > 0" class="chat-list">
-                <view v-for="(item, index) in chatList" :key="index" class="chat-card" @tap="goToDetail(item)">
+                <view v-for="(item, index) in chatList" :key="index" class="chat-card" @click="goToDetail(item)">
                     <view class="card-header">
                         <text class="card-title">{{ item.title }}</text>
                         <text class="time">{{ formatTime(item.createdAt || item.updatedAt) }}</text>
@@ -48,7 +48,6 @@ import { formatTime } from '@/utils/format'
 
 const statusBarHeight = ref(44)
 const chatList = ref([])
-const loading = ref(false)
 
 onMounted(() => {
     const info = uni.getSystemInfoSync()
@@ -57,7 +56,6 @@ onMounted(() => {
 })
 
 async function loadChats() {
-    loading.value = true
     try {
         const res = await chatApi.listChats()
         if (res.code === 0) {
@@ -65,8 +63,6 @@ async function loadChats() {
         }
     } catch (e) {
         console.error('[chats] 加载失败', e)
-    } finally {
-        loading.value = false
     }
 }
 

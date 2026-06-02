@@ -1,7 +1,7 @@
 <template>
     <view class="page-subscribe">
         <view class="nav" :style="{ paddingTop: statusBarHeight + 'px' }">
-            <view class="back" @tap="goBack">
+            <view class="back" @click="goBack">
                 <uni-icons type="back" color="#1e3322" size="22" />
             </view>
             <text class="nav-title">购买次数</text>
@@ -15,7 +15,7 @@
                 <view v-if="loading" class="loading-text">加载套餐中...</view>
                 <view v-else-if="plans.length === 0" class="loading-text">暂无可购买套餐</view>
                 <view v-else class="plans-list">
-                    <view v-for="(plan, idx) in plans" :key="idx" class="plan-card" :class="{ selected: selected === idx, popular: plan.popular }" @tap="selected = idx">
+                    <view v-for="(plan, idx) in plans" :key="idx" class="plan-card" :class="{ selected: selected === idx, popular: plan.popular }" @click="selected = idx">
                         <view v-if="plan.popular" class="popular-tag">推荐</view>
                         <view class="plan-top">
                             <text class="plan-name">{{ plan.name }}</text>
@@ -34,7 +34,7 @@
                     </view>
                 </view>
 
-                <view v-if="plans.length > 0" class="pay-btn" :class="{ disabled: paying || selected < 0 }" @tap="handlePay">
+                <view v-if="plans.length > 0" class="pay-btn" :class="{ disabled: paying || selected < 0 }" @click="handlePay">
                     <text>{{ paying ? '处理中...' : selected < 0 ? '请选择套餐' : '立即支付 ¥' + plans[selected].price }}</text>
                 </view>
                 <text v-if="plans.length > 0" class="pay-note">支付即表示同意《用户协议》</text>
@@ -42,12 +42,12 @@
         </scroll-view>
 
         <!-- 支付成功弹窗 -->
-        <view v-if="showSuccess" class="modal-overlay" @tap="showSuccess = false">
-            <view class="modal-box" @tap.stop>
+        <view v-if="showSuccess" class="modal-overlay" @click="showSuccess = false">
+            <view class="modal-box" @click.stop>
                 <view class="modal-icon">✓</view>
                 <text class="modal-title">支付成功</text>
                 <text class="modal-desc">{{ successMsg }}</text>
-                <view class="modal-btn" @tap="showSuccess = false">知道了</view>
+                <view class="modal-btn" @click="showSuccess = false">知道了</view>
             </view>
         </view>
     </view>

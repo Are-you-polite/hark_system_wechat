@@ -29,11 +29,7 @@ export const userApi = {
         return request('user.addAdReward')
     },
 
-    topUpCredits(amount) {
-        return request('user.topUpCredits', { amount })
-    },
-
-    vipRenew() {
-        return request('user.vipRenew')
+    updateProfile({ nickName, avatarUrl }) {
+        return request('user.updateProfile', { nickName, avatarUrl })
     }
 }

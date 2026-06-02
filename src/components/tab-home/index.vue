@@ -21,7 +21,7 @@
                         <view class="card-content">
                             <text class="card-title">你的性格{{ '\n' }}藏着无限可能</text>
                             <text class="card-desc">完成性格测试，获取专属于你的深度解读报告与个人成长指南</text>
-                            <view class="btn-start" @tap="goTest">
+                            <view class="btn-start" @click="goTest">
                                 <text class="btn-text">开始性格测试</text>
                                 <uni-icons type="arrow-right" color="#ffffff" size="18" />
                             </view>
@@ -46,7 +46,7 @@
                     <view class="resume-card">
                         <text class="rc-title">{{ store.hasProgress ? '继续完成测试' : '你的性格' }}{{ '\n' }}{{ store.hasProgress ? '离结果只差一步' : '藏着无限可能' }}</text>
                         <text class="rc-desc">{{ store.hasProgress ? `已完成 ${store.currentIndex}/${store.totalQuestions} 题，继续答题即可生成报告` : '完成性格测试，获取专属于你的深度解读报告与个人成长指南' }}</text>
-                        <view class="btn-start" @tap="goTest">
+                        <view class="btn-start" @click="goTest">
                             <text class="btn-text">{{ store.hasProgress ? '继续答题' : '开始性格测试' }}</text>
                             <uni-icons type="arrow-right" color="#ffffff" size="18" />
                         </view>
@@ -122,7 +122,7 @@
                         <text class="r-body">{{ socialAdvice }}</text>
                     </view>
 
-                    <view class="ai-entry" @tap="goAiChat">
+                    <view class="ai-entry" @click="goAiChat">
                         <view class="ai-left">
                             <view class="ai-icon">
                                 <uni-icons type="chatboxes" color="#ffffff" size="18" />
@@ -136,7 +136,7 @@
                     </view>
 
                     <view class="action-row">
-                        <view class="ar-btn" @tap="handleRetest">重新测试</view>
+                        <view class="ar-btn" @click="handleRetest">重新测试</view>
                         <button class="ar-btn" open-type="share">分享</button>
                     </view>
 

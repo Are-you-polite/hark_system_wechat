@@ -1,7 +1,7 @@
 <template>
     <view class="page-chat-detail">
         <view class="nav-bar" :style="{ paddingTop: statusBarHeight + 'px' }">
-            <view class="back-btn" @tap="goBack">
+            <view class="back-btn" @click="goBack">
                 <uni-icons type="back" color="#1e3322" size="20" />
             </view>
             <view class="nav-info">
@@ -26,7 +26,7 @@
                 <view v-if="messages.length === 0" class="suggestions-section">
                     <text class="suggestions-label">试试这些问题</text>
                     <view class="suggestions-grid">
-                        <view v-for="(s, i) in suggestions" :key="i" class="suggestion-pill" @tap="sendSuggestion(s)">
+                        <view v-for="(s, i) in suggestions" :key="i" class="suggestion-pill" @click="sendSuggestion(s)">
                             <text class="pill-text">{{ s }}</text>
                         </view>
                     </view>
@@ -38,7 +38,7 @@
                             <uni-icons type="chatbubble-filled" color="#ffffff" size="16" />
                         </view>
                         <view class="bubble">
-                            <view v-if="msg.role === 'ai' && msg.reasoning_content" class="reasoning-toggle" @tap="msg.reasoningExpanded = !msg.reasoningExpanded">
+                            <view v-if="msg.role === 'ai' && msg.reasoning_content" class="reasoning-toggle" @click="msg.reasoningExpanded = !msg.reasoningExpanded">
                                 <uni-icons :type="msg.reasoningExpanded ? 'bottom' : 'right'" color="#808a80" size="14" />
                                 <text class="reasoning-toggle-text">思考过程</text>
                             </view>
@@ -57,23 +57,23 @@
 
         <view class="input-bar">
             <input v-model="inputText" class="input-box" type="text" placeholder="输入你的问题..." :disabled="streaming" cursor-spacing="20" @confirm="sendMessage" />
-            <view class="send-btn" :class="{ disabled: streaming }" @tap="sendMessage">
+            <view class="send-btn" :class="{ disabled: streaming }" @click="sendMessage">
                 <uni-icons type="arrow-up" color="#ffffff" size="20" />
             </view>
         </view>
 
         <!-- 次数不足底部面板 -->
-        <view v-if="showNoCredits" class="modal-overlay" @tap="showNoCredits = false">
-            <view class="bottom-sheet" @tap.stop>
+        <view v-if="showNoCredits" class="modal-overlay" @click="showNoCredits = false">
+            <view class="bottom-sheet" @click.stop>
                 <view class="sheet-handle" />
                 <text class="sheet-title">对话次数已用完</text>
                 <text class="sheet-desc">选择以下方式获取更多对话次数</text>
                 <view class="sheet-actions">
-                    <view class="sheet-btn btn-primary" @tap="goBuy">
+                    <view class="sheet-btn btn-primary" @click="goBuy">
                         <uni-icons type="wallet" color="#ffffff" size="20" />
                         <text class="btn-label">购买次数 ¥9.9 起</text>
                     </view>
-                    <view class="sheet-btn btn-secondary" @tap="watchAd">
+                    <view class="sheet-btn btn-secondary" @click="watchAd">
                         <uni-icons type="star-filled" color="#2d6b3f" size="20" />
                         <text class="btn-label">看广告得 1 次</text>
                     </view>

@@ -6,7 +6,7 @@ exports.main = async () => {
     const results = []
 
     // 创建集合（如果不存在）
-    const collections = ['wechat_test_progress', 'wechat_test_results', 'shared_chat_records', 'shared_products']
+    const collections = ['wechat_test_progress', 'wechat_test_results', 'shared_chat_records', 'shared_products', 'shared_match_records']
     for (const name of collections) {
         try {
             await db.createCollection(name)

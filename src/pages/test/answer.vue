@@ -2,7 +2,7 @@
     <view class="page-test">
         <!-- 顶部导航 -->
         <view class="nav" :style="{ paddingTop: statusBarHeight + 'px' }">
-            <view class="nav-left" @tap="localIndex > 0 ? prevQuestion() : goBack()">
+            <view class="nav-left" @click="localIndex > 0 ? prevQuestion() : goBack()">
                 <text class="nav-label">{{ localIndex > 0 ? '上一题' : '退出' }}</text>
             </view>
             <text class="nav-count">{{ localIndex + 1 }} / {{ total }}</text>
@@ -33,13 +33,13 @@
                 <text class="question">{{ currentQ.text }}</text>
 
                 <view class="options">
-                    <view class="option" :class="{ selected: localSelected === 'a' }" @tap="selectOption('a')">
+                    <view class="option" :class="{ selected: localSelected === 'a' }" @click="selectOption('a')">
                         <view class="radio">
                             <view class="radio-dot" />
                         </view>
                         <text class="opt-text">{{ currentQ.a.text }}</text>
                     </view>
-                    <view class="option" :class="{ selected: localSelected === 'b' }" @tap="selectOption('b')">
+                    <view class="option" :class="{ selected: localSelected === 'b' }" @click="selectOption('b')">
                         <view class="radio">
                             <view class="radio-dot" />
                         </view>
@@ -50,7 +50,7 @@
 
             <!-- 底部按钮 -->
             <view class="bottom-bar">
-                <view class="btn-next" :class="{ disabled: !localSelected }" @tap="nextQuestion">
+                <view class="btn-next" :class="{ disabled: !localSelected }" @click="nextQuestion">
                     <text>{{ localIndex === total - 1 ? '完成' : '下一题' }}</text>
                     <text v-if="localIndex !== total - 1">→</text>
                     <text v-else>✓</text>

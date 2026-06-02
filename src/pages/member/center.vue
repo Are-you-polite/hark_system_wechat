@@ -1,7 +1,7 @@
 <template>
     <view class="page-center">
         <view class="nav" :style="{ paddingTop: statusBarHeight + 'px' }">
-            <view class="back" @tap="goBack">
+            <view class="back" @click="goBack">
                 <uni-icons type="back" color="#1e3322" size="22" />
             </view>
             <text class="nav-title">会员中心</text>
@@ -33,7 +33,7 @@
                 </view>
 
                 <!-- 购买按钮 -->
-                <view class="buy-btn" @tap="goSubscribe">
+                <view class="buy-btn" @click="goSubscribe">
                     <text>💰 购买次数</text>
                 </view>
             </view>

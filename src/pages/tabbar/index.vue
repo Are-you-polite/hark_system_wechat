@@ -10,17 +10,20 @@
         </view>
     </view>
 
-    <FabButton icon="plusempty" :visible="currentTab === 'chats'" @tap="onNewChat" />
-    <FabButton icon="personadd-filled" :visible="currentTab === 'match'" @tap="showMatchCard = true" />
+    <FabButton icon="plusempty" :visible="currentTab === 'chats'" @click="onNewChat" />
+    <FabButton icon="personadd-filled" :visible="currentTab === 'match'" @click="onShowMatchCard" />
 
-    <view v-if="showMatchCard" class="m-overlay" @tap="showMatchCard = false">
-        <view class="m-card" @tap.stop>
-            <view class="m-close" @tap="showMatchCard = false">✕</view>
+    <!-- 资料完善弹窗 -->
+    <ProfileSetup v-if="showProfileSetup" @close="showProfileSetup = false" @saved="onProfileSaved" />
+
+    <view v-if="showMatchCard" class="m-overlay" @click="showMatchCard = false">
+        <view class="m-card" @click.stop>
+            <view class="m-close" @click="showMatchCard = false">✕</view>
             <view class="m-code">{{ mStore.personalityType || '--' }}</view>
             <view class="m-name">{{ mStore.personalityTypeName || '未测试' }}</view>
             <view class="m-tags">{{ mTags || '完成测试后查看你的性格类型' }}</view>
             <view class="m-divider" />
-            <button class="m-share" open-type="share" @tap="showMatchCard = false">
+            <button class="m-share" open-type="share">
                 <text class="ms-icon">💬</text>
                 <text class="ms-text">分享我的性格卡片</text>
             </button>
@@ -44,18 +47,56 @@ import tabChats from '@/components/tab-chats/index.vue'
 import tabMatch from '@/components/tab-match/index.vue'
 import tabMine from '@/components/tab-mine/index.vue'
 import FabButton from '@/components/FabButton.vue'
+import ProfileSetup from '@/components/ProfileSetup.vue'
 import { useUserStore } from '@/stores/user'
-import { useShare } from '@/hooks/useShare'
 
 const mStore = useUserStore()
 
-useShare(() => ({
-    title: mStore.personalityType ? `我是 ${mStore.personalityType} · ${mStore.personalityTypeName} — 来测测你的性格类型` : '向内倾听 — 了解自己，从倾听内心开始',
-    path: '/pages/tabbar/index'
-}))
+onShareAppMessage(() => {
+    const p = mStore.user?._id ? `/pages/tabbar/index?inviterId=${encodeURIComponent(mStore.user._id)}&inviterType=${encodeURIComponent(mStore.personalityType)}&inviterName=${encodeURIComponent(mStore.nickName || '')}` : '/pages/tabbar/index'
+    return {
+        title: mStore.personalityType ? `我是 ${mStore.personalityType} · ${mStore.personalityTypeName} — 来测测你的性格类型` : '向内倾听 — 了解自己，从倾听内心开始',
+        path: p
+    }
+})
 
 const currentTab = ref('home')
 const showMatchCard = ref(false)
+const showProfileSetup = ref(false)
+const pendingShowCard = ref(false) // 完善资料后是否要显示分享卡片
+
+function onShowMatchCard() {
+    if (!mStore.profileComplete) {
+        // 先完善资料
+        pendingShowCard.value = true
+        showProfileSetup.value = true
+    } else {
+        showMatchCard.value = true
+    }
+}
+
+function onProfileSaved() {
+    showProfileSetup.value = false
+    if (pendingShowCard.value) {
+        pendingShowCard.value = false
+        showMatchCard.value = true
+    }
+}
+
+onLoad((options) => {
+    if (options?.inviterId && !mStore.inviteHandled) {
+        mStore.setInviter(options.inviterId, options.inviterType || '', options.inviterName ? decodeURIComponent(options.inviterName) : '')
+        mStore.inviteHandled = true
+
+        const timer = setInterval(() => {
+            if (mStore.loggedIn) {
+                clearInterval(timer)
+                uni.navigateTo({ url: '/pages/match/invite' })
+            }
+        }, 200)
+        setTimeout(() => clearInterval(timer), 10000)
+    }
+})
 
 const mTags = computed(() => {
     const tags = mStore.result?.typeTags

@@ -13,6 +13,7 @@ const routes = {
     'user.addAdReward': require('./routes/user').addAdReward,
     'user.topUpCredits': require('./routes/user').topUpCredits,
     'user.vipRenew': require('./routes/user').vipRenew,
+    'user.updateProfile': require('./routes/user').updateProfile,
     'questions.list': require('./routes/questions').list,
     'products.list': require('./routes/payment').listProducts,
     'chat.getConfig': require('./routes/chat').getConfig,
@@ -21,7 +22,11 @@ const routes = {
     'chat.getDetail': require('./routes/chat').getDetail,
     'payment.prepay': require('./routes/payment').prepay,
     'payment.confirm': require('./routes/payment').confirm,
-    'payment.list': require('./routes/payment').listOrders
+    'payment.list': require('./routes/payment').listOrders,
+    'match.getInviteInfo': require('./routes/match').getInviteInfo,
+    'match.confirm': require('./routes/match').confirm,
+    'match.list': require('./routes/match').list,
+    'match.getDetail': require('./routes/match').getDetail
 }
 
 exports.main = async (event) => {

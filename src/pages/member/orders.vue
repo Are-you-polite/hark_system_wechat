@@ -1,7 +1,7 @@
 <template>
     <view class="page-orders">
         <view class="top-area" :style="{ paddingTop: statusBarHeight + 'px' }">
-            <view class="top-back" @tap="goBack">
+            <view class="top-back" @click="goBack">
                 <uni-icons type="back" color="#1e3322" size="22" />
             </view>
             <text class="top-title">购买记录</text>

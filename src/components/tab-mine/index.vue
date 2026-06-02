@@ -40,7 +40,7 @@
 
                 <!-- 操作列表 -->
                 <view class="action-card">
-                    <view class="action-row" @tap="goMember">
+                    <view class="action-row" @click="goMember">
                         <view class="action-icon" style="background: rgba(45, 107, 63, 0.1); color: #2d6b3f">
                             <uni-icons type="vip" color="#2d6b3f" size="18" />
                         </view>
@@ -50,7 +50,7 @@
                         </view>
                         <uni-icons type="forward" color="#c0c4c0" size="16" />
                     </view>
-                    <view class="action-row" @tap="goOrders">
+                    <view class="action-row" @click="goOrders">
                         <view class="action-icon" style="background: rgba(43, 108, 176, 0.1); color: #2b6cb0">
                             <uni-icons type="list" color="#2b6cb0" size="18" />
                         </view>
@@ -60,7 +60,7 @@
                         </view>
                         <uni-icons type="forward" color="#c0c4c0" size="16" />
                     </view>
-                    <view class="action-row" @tap="goSetting">
+                    <view class="action-row" @click="goSetting">
                         <view class="action-icon" style="background: rgba(128, 138, 128, 0.1); color: #808a80">
                             <uni-icons type="gear" color="#808a80" size="18" />
                         </view>

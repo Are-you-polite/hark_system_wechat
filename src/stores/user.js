@@ -1,6 +1,5 @@
 export const useUserStore = defineStore('user', () => {
     const loggedIn = ref(false)
-    const isNewUser = ref(false)
     const user = ref(null)
 
     const creditBalance = ref(0)
@@ -18,6 +17,19 @@ export const useUserStore = defineStore('user', () => {
     const progressId = ref(null)
     const result = ref(null)
 
+    // 个人资料
+    const nickName = ref('')
+    const avatarUrl = ref('')
+
+    const profileComplete = computed(() => !!nickName.value)
+
+    // 匹配邀请相关
+    const inviterId = ref('')
+    const inviterType = ref('')
+    const inviterName = ref('')
+    const pendingMatchInvite = ref(false) // 有邀请待处理（答题完成后弹窗）
+    const inviteHandled = ref(false) // 本会话已处理过邀请，防止重复
+
     const loading = ref(false)
 
     const hasTested = computed(() => testStatus.value === 'completed')
@@ -27,7 +39,6 @@ export const useUserStore = defineStore('user', () => {
     const personalityType = computed(() => result.value?.type || user.value?.personalityType || '')
     const personalityTypeName = computed(() => result.value?.typeName || user.value?.personalityTypeName || '')
     const isVipActive = computed(() => isVip.value && vipExpireAt.value && new Date(vipExpireAt.value) > new Date())
-    const remainingCredits = computed(() => creditBalance.value)
 
     function setUser(userData) {
         user.value = userData
@@ -36,6 +47,17 @@ export const useUserStore = defineStore('user', () => {
         isVip.value = userData.isVip || false
         vipExpireAt.value = userData.vipExpireAt || null
         adRewardCount.value = userData.adRewardCount || 0
+        nickName.value = userData.nickName || ''
+        avatarUrl.value = userData.avatarUrl || ''
+    }
+
+    function setProfile(data) {
+        if (data.nickName) nickName.value = data.nickName
+        if (data.avatarUrl) avatarUrl.value = data.avatarUrl
+        if (user.value) {
+            if (data.nickName) user.value.nickName = data.nickName
+            if (data.avatarUrl) user.value.avatarUrl = data.avatarUrl
+        }
     }
 
     function setTestProgress(data) {
@@ -80,9 +102,24 @@ export const useUserStore = defineStore('user', () => {
         dailyFreeUsed.value = data.dailyFreeUsed || 0
     }
 
+    function setInviter(id, type, name) {
+        inviterId.value = id
+        inviterType.value = type || ''
+        inviterName.value = name || ''
+    }
+
+    function clearInviter() {
+        inviterId.value = ''
+        inviterType.value = ''
+        inviterName.value = ''
+        pendingMatchInvite.value = false
+    }
+
     function logout() {
         loggedIn.value = false
         user.value = null
+        nickName.value = ''
+        avatarUrl.value = ''
         testStatus.value = 'not_started'
         currentIndex.value = 0
         answers.value = []
@@ -91,11 +128,11 @@ export const useUserStore = defineStore('user', () => {
         isVip.value = false
         vipExpireAt.value = null
         adRewardCount.value = 0
+        clearInviter()
     }
 
     return {
         loggedIn,
-        isNewUser,
         user,
         creditBalance,
         isVip,
@@ -110,6 +147,14 @@ export const useUserStore = defineStore('user', () => {
         answers,
         progressId,
         result,
+        inviterId,
+        inviterType,
+        inviterName,
+        pendingMatchInvite,
+        inviteHandled,
+        nickName,
+        avatarUrl,
+        profileComplete,
         loading,
         hasTested,
         hasProgress,
@@ -117,13 +162,15 @@ export const useUserStore = defineStore('user', () => {
         personalityType,
         personalityTypeName,
         isVipActive,
-        remainingCredits,
         setUser,
         setTestProgress,
         updateProgress,
         setTestResult,
         resetTest,
         setCredits,
+        setInviter,
+        clearInviter,
+        setProfile,
         logout
     }
 })

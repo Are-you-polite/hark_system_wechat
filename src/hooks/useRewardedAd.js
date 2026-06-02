@@ -1,18 +1,25 @@
 export function useRewardedAd(adUnitId = '') {
-    const rewardedAd = ref(null)
     const isReady = ref(false)
+    let ad = null
+    let closeResolve = null
 
     function initAd() {
-        if (rewardedAd.value) return
+        if (ad) return
         try {
-            const ad = wx.createRewardedVideoAd({ adUnitId })
+            ad = wx.createRewardedVideoAd({ adUnitId })
             ad.onLoad(() => {
                 isReady.value = true
             })
             ad.onError(() => {
                 isReady.value = false
             })
-            rewardedAd.value = ad
+            ad.onClose((res) => {
+                isReady.value = false
+                if (closeResolve) {
+                    closeResolve(res && res.isEnded)
+                    closeResolve = null
+                }
+            })
         } catch (e) {
             console.error('[ad] 创建失败', e)
         }
@@ -20,19 +27,18 @@ export function useRewardedAd(adUnitId = '') {
 
     function showAd() {
         initAd()
-        const ad = rewardedAd.value
         if (!ad) return Promise.resolve(false)
 
         return new Promise((resolve) => {
-            ad.show()
-                .then(() => {
-                    ad.onClose((res) => resolve(res && res.isEnded))
-                })
-                .catch(() => {
-                    ad.load()
-                        .then(() => ad.show().then(() => ad.onClose((res) => resolve(res && res.isEnded))))
-                        .catch(() => resolve(false))
-                })
+            closeResolve = resolve
+            ad.show().catch(() => {
+                ad.load()
+                    .then(() => ad.show())
+                    .catch(() => {
+                        closeResolve = null
+                        resolve(false)
+                    })
+            })
         })
     }
 

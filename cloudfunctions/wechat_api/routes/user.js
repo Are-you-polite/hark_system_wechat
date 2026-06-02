@@ -300,4 +300,32 @@ async function vipRenew(event, { db, cloud }) {
     return { code: 0, data: { vipExpireAt } }
 }
 
-module.exports = { login, getProgress, saveProgress, submitResult, getCredits, deductCredit, addAdReward, topUpCredits, vipRenew }
+async function updateProfile(event, { db, cloud }) {
+    const wxContext = cloud.getWXContext()
+    const openId = wxContext.OPENID
+    const { nickName, avatarUrl } = event
+
+    if (!nickName && !avatarUrl) {
+        return { code: 1, message: '昵称和头像不能同时为空' }
+    }
+
+    const userRes = await db.collection('shared_users').where({ openId }).get()
+    if (userRes.data.length === 0) return { code: 1, message: '用户不存在' }
+    const user = userRes.data[0]
+
+    const updateData = { updatedAt: db.serverDate() }
+    if (nickName) updateData.nickName = nickName
+    if (avatarUrl) updateData.avatarUrl = avatarUrl
+
+    await db.collection('shared_users').doc(user._id).update({ data: updateData })
+
+    return {
+        code: 0,
+        data: {
+            nickName: nickName || user.nickName || '',
+            avatarUrl: avatarUrl || user.avatarUrl || ''
+        }
+    }
+}
+
+module.exports = { login, getProgress, saveProgress, submitResult, getCredits, deductCredit, addAdReward, topUpCredits, vipRenew, updateProfile }
