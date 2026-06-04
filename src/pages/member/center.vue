@@ -1,40 +1,59 @@
 <template>
     <view class="page-center">
+        <!-- 导航栏 -->
         <view class="nav" :style="{ paddingTop: statusBarHeight + 'px' }">
-            <view class="back" @click="goBack">
-                <uni-icons type="back" color="#1e3322" size="22" />
-            </view>
+            <text class="nav-back" @click="goBack">返回</text>
             <text class="nav-title">会员中心</text>
-            <view class="nav-ph" />
+            <text class="nav-ph">返回</text>
         </view>
 
         <scroll-view scroll-y class="scroll-area">
             <view class="scroll-inner">
-                <!-- 余额卡片 -->
-                <view class="balance-card">
-                    <text class="bc-num">{{ store.isVipActive ? '∞' : store.creditBalance }}</text>
-                    <view class="bc-right">
-                        <text class="bc-label">剩余对话次数</text>
-                        <text class="bc-sub">今日免费剩余 {{ Math.max(0, store.dailyFreeTotal - store.dailyFreeUsed) }} / {{ store.dailyFreeTotal }} 次</text>
-                        <text v-if="store.isVipActive" class="bc-badge">月卡会员 · {{ store.vipExpireAt ? new Date(store.vipExpireAt).toLocaleDateString('zh-CN') : '' }} 到期</text>
+                <!-- 会员卡片 -->
+                <view class="vip-card">
+                    <view class="vc-top">
+                        <text class="vc-label">我的账户</text>
+                        <view class="vc-badge">{{ store.isVipActive ? '月卡会员' : '普通用户' }}</view>
+                    </view>
+                    <view class="vc-num-row">
+                        <text class="vc-num">{{ store.isVipActive ? '∞' : store.creditBalance }}</text>
+                        <text class="vc-unit">次</text>
+                    </view>
+                    <text class="vc-desc">剩余对话次数</text>
+                    <view class="vc-divider" />
+                    <view class="vc-stats">
+                        <view class="vc-stat-item">
+                            <text class="vc-stat-num">{{ Math.max(0, store.dailyFreeTotal - store.dailyFreeUsed) }}/{{ store.dailyFreeTotal }}</text>
+                            <text class="vc-stat-label">今日免费剩余</text>
+                        </view>
+                        <view class="vc-stat-line" />
+                        <view class="vc-stat-item">
+                            <text class="vc-stat-num">{{ store.user?.totalUsed || 0 }}</text>
+                            <text class="vc-stat-label">累计使用</text>
+                        </view>
                     </view>
                 </view>
 
-                <!-- 信息 -->
+                <!-- 信息卡片 -->
                 <view class="info-card">
                     <view class="info-row">
                         <text class="info-label">账户状态</text>
-                        <text class="info-value" :class="{ vip: store.isVipActive }">{{ store.isVipActive ? '月卡会员' : '普通用户' }}</text>
+                        <text class="info-value">{{ store.isVipActive ? '月卡会员' : '普通用户' }}</text>
                     </view>
-                    <view class="info-row" style="border: none">
+                    <view class="info-row">
                         <text class="info-label">免费额度</text>
                         <text class="info-value">{{ store.dailyFreeUsed }} / {{ store.dailyFreeTotal }}</text>
+                    </view>
+                    <view class="info-row" style="border-bottom: none">
+                        <text class="info-label">到期时间</text>
+                        <text class="info-value">{{ store.isVipActive && store.vipExpireAt ? new Date(store.vipExpireAt).toLocaleDateString('zh-CN') : '—' }}</text>
                     </view>
                 </view>
 
                 <!-- 购买按钮 -->
                 <view class="buy-btn" @click="goSubscribe">
-                    <text>💰 购买次数</text>
+                    <uni-icons type="wallet" color="#ffffff" size="18" />
+                    <text class="buy-btn-text">购买次数</text>
                 </view>
             </view>
         </scroll-view>
@@ -66,129 +85,165 @@ const goSubscribe = () => uni.navigateTo({ url: '/pages/member/subscribe' })
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background-color: $color-bg;
+    background: $color-bg;
     overflow: hidden;
 }
 
+// ===== 导航栏 =====
 .nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 48rpx 24rpx;
+    height: 88rpx;
+    padding: 0 40rpx;
+    background: $color-surface;
     border-bottom: 2rpx solid $color-border;
-    background-color: $color-bg;
+}
+.nav-back {
+    font-size: 28rpx;
+    color: $color-secondary;
+    width: 100rpx;
     flex-shrink: 0;
-
-    .back {
-        width: 64rpx;
-        height: 64rpx;
-        display: flex;
-        align-items: center;
-    }
-    .nav-title {
-        font-size: 34rpx;
-        font-weight: 600;
-        color: $color-primary;
-    }
-    .nav-ph {
-        width: 64rpx;
-    }
+}
+.nav-title {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: $color-primary;
+}
+.nav-ph {
+    font-size: 28rpx;
+    color: transparent;
+    width: 100rpx;
+    flex-shrink: 0;
 }
 
+// ===== Scroll =====
 .scroll-area {
     flex: 1;
     height: 0;
     overflow: hidden;
 }
 .scroll-inner {
-    padding: 24rpx 48rpx 32rpx;
+    padding: 0 40rpx 60rpx 40rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 16rpx;
 }
 
-// 余额卡片
-.balance-card {
+// ===== 会员卡片 =====
+.vip-card {
+    background: $color-accent;
+    border-radius: $radius-sm;
+    padding: 48rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 24rpx;
+    margin-top: 8rpx;
+    box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+.vc-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.vc-label {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+}
+.vc-badge {
+    font-size: 18rpx;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.15);
+    padding: 6rpx 20rpx;
+    border-radius: 999rpx;
+}
+.vc-num-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8rpx;
+}
+.vc-num {
+    font-size: 96rpx;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+}
+.vc-unit {
+    font-size: 28rpx;
+    color: rgba(255, 255, 255, 0.6);
+    padding-bottom: 12rpx;
+}
+.vc-desc {
+    font-size: 24rpx;
+    color: rgba(255, 255, 255, 0.6);
+}
+.vc-divider {
+    height: 2rpx;
+    background: rgba(255, 255, 255, 0.15);
+}
+.vc-stats {
     display: flex;
     align-items: center;
-    gap: 32rpx;
-    padding: 48rpx;
-    background: $color-surface;
-    border-radius: $radius-md;
-    box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.04);
-
-    .bc-num {
-        font-size: 84rpx;
-        font-weight: 700;
-        color: $color-accent;
-        flex-shrink: 0;
-        min-width: 128rpx;
-        text-align: center;
-    }
-    .bc-right {
-        flex: 1;
-    }
-    .bc-label {
-        font-size: 28rpx;
-        color: $color-primary;
-        font-weight: 600;
-    }
-    .bc-sub {
-        font-size: 24rpx;
-        color: $color-muted;
-        margin-top: 4rpx;
-        display: block;
-    }
-    .bc-badge {
-        display: inline-block;
-        margin-top: 12rpx;
-        padding: 4rpx 20rpx;
-        background: rgba($color-accent, 0.06);
-        border-radius: 20rpx;
-        font-size: 22rpx;
-        color: $color-accent;
-    }
+}
+.vc-stat-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4rpx;
+}
+.vc-stat-num {
+    font-size: 36rpx;
+    font-weight: 700;
+    color: #ffffff;
+}
+.vc-stat-label {
+    font-size: 20rpx;
+    color: rgba(255, 255, 255, 0.5);
+}
+.vc-stat-line {
+    width: 2rpx;
+    height: 72rpx;
+    background: rgba(255, 255, 255, 0.15);
 }
 
-// 信息
+// ===== 信息卡片 =====
 .info-card {
-    margin-top: 28rpx;
     background: $color-surface;
     border: 2rpx solid $color-border;
-    border-radius: $radius-md;
-    padding: 0 40rpx;
-
-    .info-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 32rpx 0;
-        border-bottom: 2rpx solid $color-border;
-
-        .info-label {
-            font-size: 26rpx;
-            color: $color-secondary;
-        }
-        .info-value {
-            font-size: 26rpx;
-            font-weight: 600;
-            color: $color-primary;
-        }
-        .info-value.vip {
-            color: $color-accent;
-        }
-    }
+    border-radius: $radius-sm;
+    overflow: hidden;
+}
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 28rpx 32rpx;
+    border-bottom: 2rpx solid $color-border;
+}
+.info-label {
+    font-size: 26rpx;
+    color: $color-secondary;
+}
+.info-value {
+    font-size: 26rpx;
+    font-weight: 600;
+    color: $color-primary;
 }
 
-// 购买按钮
+// ===== 购买按钮 =====
 .buy-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16rpx;
-    width: 100%;
-    padding: 32rpx 0;
-    margin-top: 40rpx;
-    background: linear-gradient(135deg, $color-accent, $color-accent-dark);
-    border-radius: $radius-md;
-    font-size: 32rpx;
+    gap: 12rpx;
+    height: 88rpx;
+    border-radius: $radius-btn;
+    background: $color-accent;
+}
+.buy-btn-text {
+    font-size: 30rpx;
     font-weight: 600;
     color: #ffffff;
 }

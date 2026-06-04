@@ -16,8 +16,7 @@
         {
             "root": "pages/match",
             "pages": [
-                { "path": "result", "style": { "navigationStyle": "custom" } },
-                { "path": "invite", "style": { "navigationStyle": "custom" } }
+                { "path": "result", "style": { "navigationStyle": "custom" } }
             ]
         },
         {

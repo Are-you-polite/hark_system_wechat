@@ -8,44 +8,59 @@
         </view>
 
         <scroll-view scroll-y class="scroll-area">
+            <!-- 2-3 有对话记录 -->
             <view v-if="chatList.length > 0" class="chat-list">
                 <view v-for="(item, index) in chatList" :key="index" class="chat-card" @click="goToDetail(item)">
-                    <view class="card-header">
-                        <text class="card-title">{{ item.title }}</text>
-                        <text class="time">{{ formatTime(item.createdAt || item.updatedAt) }}</text>
+                    <view class="cc-header">
+                        <text class="cc-title">{{ item.title }}</text>
+                        <text class="cc-time">{{ formatTime(item.createdAt || item.updatedAt) }}</text>
                     </view>
-                    <view class="card-body">
-                        <text class="card-preview">{{ item.preview }}</text>
+                    <view class="cc-body">
+                        <text class="cc-preview">{{ item.preview }}</text>
                     </view>
-                    <view class="card-footer">
-                        <view class="footer-left">
-                            <uni-icons type="chatbubble" color="#a0a8a0" size="14" />
-                            <text class="footer-text">AI 深度解读</text>
+                    <view class="cc-footer">
+                        <view class="cc-footer-left">
+                            <uni-icons type="chatbubble" color="#808a80" size="14" />
+                            <text class="cc-footer-tag">AI 深度解读</text>
                         </view>
-                        <view class="btn-continue">
-                            <text>继续探索</text>
+                        <view class="cc-footer-right">
+                            <text class="cc-footer-action">继续探索</text>
                             <uni-icons type="arrow-right" color="#2d6b3f" size="12" />
                         </view>
                     </view>
                 </view>
-                <view class="bottom-safe" />
             </view>
 
-            <view v-else class="empty-state">
-                <view class="empty-icon-wrap">
-                    <uni-icons type="star-filled" color="#2d6b3f" size="40" />
+            <!-- 2-2 已测试无记录 -->
+            <view v-else-if="store.hasTested" class="empty-wrap">
+                <view class="empty-icon-box">
+                    <uni-icons type="chatboxes" color="#2d6b3f" size="28" />
                 </view>
-                <text class="empty-title">一切从这里开始</text>
-                <text class="empty-desc">开启你的第一次 AI 性格探索之旅</text>
+                <text class="empty-title">开始你的第一次对话</text>
+                <text class="empty-desc">已完成性格测试，现在可以开启 AI 深度对话，\n探索你内心的更多面向</text>
+                <view class="empty-btn" @click="goNewChat">
+                    <text class="empty-btn-text">开启对话</text>
+                </view>
+            </view>
+
+            <!-- 2-1 未测试 -->
+            <view v-else class="empty-wrap">
+                <view class="empty-icon-box">
+                    <uni-icons type="chatboxes" color="#2d6b3f" size="28" />
+                </view>
+                <text class="empty-title">暂无对话记录</text>
+                <text class="empty-desc">完成性格测试后即可开启 AI 对话，\n深入探索你的内心世界</text>
             </view>
         </scroll-view>
     </view>
 </template>
 
 <script setup>
+import { useUserStore } from '@/stores/user'
 import { chatApi } from '@/api/chat'
 import { formatTime } from '@/utils/format'
 
+const store = useUserStore()
 const statusBarHeight = ref(44)
 const chatList = ref([])
 
@@ -66,7 +81,9 @@ async function loadChats() {
     }
 }
 
-const goToDetail = (item) => uni.navigateTo({ url: '/pages/chat/detail?chatId=' + (item._id || '') })
+function goToDetail(item) {
+    uni.navigateTo({ url: '/pages/chat/detail?chatId=' + (item._id || '') })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -75,90 +92,83 @@ const goToDetail = (item) => uni.navigateTo({ url: '/pages/chat/detail?chatId=' 
 .page-chats {
     display: flex;
     flex-direction: column;
-    background-color: $color-bg;
+    width: 100%;
     height: 100%;
+    background: $color-bg;
     overflow: hidden;
-    position: relative;
 }
 
+// ===== Header =====
 .header {
-    padding: $spacing-md 0 0;
-    margin: 0 $spacing-xl $spacing-md;
+    padding: 0 48rpx 32rpx 48rpx;
+    background: $color-bg;
 }
-
 .header-text {
     display: flex;
     flex-direction: column;
+    gap: 8rpx;
 }
-
 .title {
     font-size: 44rpx;
     font-weight: 700;
     color: $color-primary;
-    margin-bottom: $spacing-xs;
 }
-
 .subtitle {
     font-size: 26rpx;
     color: $color-secondary;
 }
-
+// ===== Scroll =====
 .scroll-area {
     flex: 1;
     height: 0;
     overflow: hidden;
 }
 
+// ===== 2-3 对话卡片列表 =====
 .chat-list {
-    padding: 0 $spacing-xl;
+    padding: 0 40rpx 180rpx 40rpx;
     display: flex;
     flex-direction: column;
-    gap: $spacing-md;
+    gap: 24rpx;
 }
-
 .chat-card {
-    background-color: #ffffff;
+    background: $color-surface;
     border-radius: $radius-lg;
-    padding: $spacing-lg;
-    box-shadow: $shadow-card;
+    padding: 32rpx;
     display: flex;
     flex-direction: column;
+    gap: 16rpx;
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
 }
 
-.card-header {
+// 卡片头部
+.cc-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: $spacing-md;
 }
-
-.card-title {
+.cc-title {
     font-size: 30rpx;
     font-weight: 700;
     color: $color-primary;
-    line-height: 1.4;
     flex: 1;
-    margin-right: $spacing-sm;
+    margin-right: 16rpx;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-
-.time {
+.cc-time {
     font-size: 22rpx;
     color: $color-muted;
     flex-shrink: 0;
-    font-variant-numeric: tabular-nums;
 }
 
-.card-body {
+// 卡片主体
+.cc-body {
     display: flex;
     flex-direction: column;
-    gap: $spacing-sm;
-    margin-bottom: 28rpx;
 }
-
-.card-preview {
+.cc-preview {
     font-size: 26rpx;
     color: $color-secondary;
     line-height: 1.6;
@@ -169,67 +179,76 @@ const goToDetail = (item) => uni.navigateTo({ url: '/pages/chat/detail?chatId=' 
     overflow: hidden;
 }
 
-.card-footer {
+// 卡片底部（顶部分割线 1px solid $line）
+.cc-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: $spacing-md;
-    border-top: 2rpx dashed $color-border;
+    padding-top: 20rpx;
+    border-top: 2rpx solid $color-border;
 }
-
-.footer-left {
+.cc-footer-left {
     display: flex;
     align-items: center;
-    gap: $spacing-xs;
+    gap: 8rpx;
 }
-
-.footer-text {
+.cc-footer-tag {
     font-size: 22rpx;
     color: $color-muted;
 }
-
-.btn-continue {
+.cc-footer-right {
     display: flex;
     align-items: center;
-    gap: 6rpx;
+    gap: 8rpx;
+}
+.cc-footer-action {
     font-size: 24rpx;
     font-weight: 600;
     color: $color-accent;
-    padding: 8rpx;
 }
 
-.bottom-safe {
-    height: calc(180rpx + env(safe-area-inset-bottom));
-}
-
-.empty-state {
+// ===== 2-1 / 2-2 空状态 =====
+.empty-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding-top: 100rpx;
+    padding: 200rpx 40rpx 0;
+    gap: 20rpx;
 }
-
-.empty-icon-wrap {
-    width: 120rpx;
-    height: 120rpx;
-    background-color: rgba(45, 107, 63, 0.05);
-    border-radius: 50%;
+.empty-icon-box {
+    width: 112rpx;
+    height: 112rpx;
+    border-radius: 28rpx;
+    background: $color-accent-bg;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: $spacing-lg;
 }
-
 .empty-title {
-    font-size: 32rpx;
-    font-weight: 700;
+    font-size: 36rpx;
+    font-weight: 600;
     color: $color-primary;
-    margin-bottom: $spacing-sm;
 }
-
 .empty-desc {
     font-size: 26rpx;
     color: $color-secondary;
+    line-height: 1.6;
+    text-align: center;
+}
+.empty-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 486rpx;
+    height: 88rpx;
+    border-radius: $radius-btn;
+    background: $color-accent;
+    margin-top: 8rpx;
+}
+.empty-btn-text {
+    font-size: 30rpx;
+    font-weight: 600;
+    color: #ffffff;
 }
 </style>

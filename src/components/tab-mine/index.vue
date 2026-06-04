@@ -1,47 +1,41 @@
 <template>
     <view class="page-mine">
         <view class="header" :style="{ paddingTop: statusBarHeight + 'px' }">
-            <text class="title">个人档案</text>
-            <text class="subtitle">记录你的每一次向内倾听</text>
+            <view class="header-text">
+                <text class="title">个人档案</text>
+                <text class="subtitle">记录你的每一次向内倾听</text>
+            </view>
         </view>
 
         <scroll-view scroll-y class="scroll-area">
             <view class="scroll-inner">
                 <!-- 人格卡片 -->
-                <view class="type-card" :class="{ empty: !store.personalityType }">
+                <view class="type-card">
                     <template v-if="store.personalityType">
+                        <view class="tc-icon">
+                            <uni-icons type="person" color="#2d6b3f" size="18" />
+                        </view>
                         <text class="tc-code">{{ store.personalityType }}</text>
                         <text class="tc-name">{{ store.personalityTypeName }}</text>
                         <text v-if="typeTags" class="tc-tags">{{ typeTags }}</text>
                     </template>
                     <template v-else>
-                        <text class="tc-code">未进行性格测试</text>
-                        <text class="tc-name">完成测试后在这里查看</text>
+                        <view class="tc-icon">
+                            <uni-icons type="person" color="#2d6b3f" size="18" />
+                        </view>
+                        <text class="tc-empty-title">你的性格档案</text>
+                        <text class="tc-empty-desc">完成 30 道性格测试题，获取你的人格类型报告、维度解读与匹配入口。</text>
+                        <view class="tc-empty-btn" @click="goTest">
+                            <text class="tc-empty-btn-text">开始性格测试</text>
+                        </view>
                     </template>
-                </view>
-
-                <!-- 统计 -->
-                <view class="stats-row">
-                    <view class="stat-item">
-                        <text class="stat-num">{{ store.user?.testCount || 0 }}</text>
-                        <text class="stat-label">完成测试</text>
-                    </view>
-                    <view class="stat-divider" />
-                    <view class="stat-item">
-                        <text class="stat-num">{{ store.creditBalance }}</text>
-                        <text class="stat-label">剩余次数</text>
-                    </view>
-                    <view class="stat-divider" />
-                    <view class="stat-item">
-                        <text class="stat-num">{{ Math.max(0, store.dailyFreeTotal - store.dailyFreeUsed) }}</text>
-                        <text class="stat-label">免费额度</text>
-                    </view>
                 </view>
 
                 <!-- 操作列表 -->
                 <view class="action-card">
+                    <!-- 会员中心 -->
                     <view class="action-row" @click="goMember">
-                        <view class="action-icon" style="background: rgba(45, 107, 63, 0.1); color: #2d6b3f">
+                        <view class="action-icon" style="background: $color-accent-bg">
                             <uni-icons type="vip" color="#2d6b3f" size="18" />
                         </view>
                         <view class="action-info">
@@ -50,8 +44,9 @@
                         </view>
                         <uni-icons type="forward" color="#c0c4c0" size="16" />
                     </view>
+                    <!-- 购买记录 -->
                     <view class="action-row" @click="goOrders">
-                        <view class="action-icon" style="background: rgba(43, 108, 176, 0.1); color: #2b6cb0">
+                        <view class="action-icon" style="background: #eef0f8">
                             <uni-icons type="list" color="#2b6cb0" size="18" />
                         </view>
                         <view class="action-info">
@@ -60,8 +55,9 @@
                         </view>
                         <uni-icons type="forward" color="#c0c4c0" size="16" />
                     </view>
+                    <!-- 设置 -->
                     <view class="action-row" @click="goSetting">
-                        <view class="action-icon" style="background: rgba(128, 138, 128, 0.1); color: #808a80">
+                        <view class="action-icon" style="background: $color-surface-secondary">
                             <uni-icons type="gear" color="#808a80" size="18" />
                         </view>
                         <view class="action-info">
@@ -73,12 +69,10 @@
                 </view>
 
                 <!-- 底部 -->
-                <view class="footer">
+                <view class="footer-info">
                     <text class="footer-name">向内倾听</text>
                     <text class="footer-ver">Version 1.0.0</text>
                 </view>
-
-                <view class="bottom-safe" />
             </view>
         </scroll-view>
     </view>
@@ -104,6 +98,9 @@ onMounted(() => {
     fetchCredits()
 })
 
+function goTest() {
+    uni.navigateTo({ url: '/pages/test/answer' })
+}
 function goMember() {
     uni.navigateTo({ url: '/pages/member/center' })
 }
@@ -121,179 +118,164 @@ function goSetting() {
 .page-mine {
     display: flex;
     flex-direction: column;
+    width: 100%;
     height: 100%;
-    background-color: $color-bg;
+    background: $color-bg;
     overflow: hidden;
 }
 
+// ===== Header =====
 .header {
-    padding: 16rpx 48rpx 24rpx;
-
-    .title {
-        display: block;
-        font-size: 48rpx;
-        font-weight: 700;
-        color: $color-primary;
-    }
-    .subtitle {
-        display: block;
-        font-size: 26rpx;
-        color: $color-secondary;
-        margin-top: 4rpx;
-    }
+    padding: 0 48rpx 32rpx 48rpx;
+    background: $color-bg;
+}
+.header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+}
+.title {
+    font-size: 44rpx;
+    font-weight: 700;
+    color: $color-primary;
+}
+.subtitle {
+    font-size: 26rpx;
+    color: $color-secondary;
 }
 
+// ===== Scroll =====
 .scroll-area {
     flex: 1;
     height: 0;
     overflow: hidden;
 }
 .scroll-inner {
-    padding: 0 $spacing-xl;
+    padding: 0 40rpx 180rpx 40rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 16rpx;
 }
 
-// 人格卡片
+// ===== 人格卡片 =====
 .type-card {
+    background: $color-surface;
+    border: 2rpx solid $color-border;
+    border-radius: $radius-sm;
+    padding: 56rpx;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 56rpx 48rpx 48rpx;
-    background: linear-gradient(135deg, $color-accent, $color-accent-dark);
-    border-radius: $radius-lg;
-    margin-top: $spacing-md;
-
-    .tc-code {
-        font-size: 80rpx;
-        font-weight: 800;
-        color: #ffffff;
-        letter-spacing: 4rpx;
-    }
-    .tc-name {
-        font-size: 36rpx;
-        font-weight: 600;
-        color: rgba(255, 255, 255, 0.9);
-        margin-top: 8rpx;
-    }
-    .tc-tags {
-        font-size: 24rpx;
-        color: rgba(255, 255, 255, 0.6);
-        margin-top: 16rpx;
-        letter-spacing: 2rpx;
-    }
-
-    &.empty {
-        background: linear-gradient(135deg, #edf1ee, #dfe8e1);
-        .tc-code {
-            font-size: 28rpx;
-            color: $color-secondary;
-            font-weight: 600;
-            letter-spacing: 0;
-        }
-        .tc-name {
-            font-size: 24rpx;
-            color: $color-secondary;
-            margin-top: $spacing-xs;
-        }
-    }
+    gap: 24rpx;
 }
-
-// 统计
-.stats-row {
+.tc-icon {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 40rpx;
+    background: $color-accent-bg;
     display: flex;
-    margin-top: 28rpx;
-    background: $color-surface;
-    border: 2rpx solid $color-border;
-    border-radius: $radius-md;
-    overflow: hidden;
-
-    .stat-item {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 32rpx 0;
-
-        .stat-num {
-            font-size: 44rpx;
-            font-weight: 800;
-            color: $color-accent;
-        }
-        .stat-label {
-            font-size: 22rpx;
-            color: $color-muted;
-            margin-top: 8rpx;
-        }
-    }
-    .stat-divider {
-        width: 2rpx;
-        background: $color-border;
-        opacity: 0.5;
-    }
+    align-items: center;
+    justify-content: center;
 }
-
-// 操作列表
-.action-card {
-    margin-top: 28rpx;
-    background: $color-surface;
-    border: 2rpx solid $color-border;
-    border-radius: $radius-md;
-    overflow: hidden;
-
-    .action-row {
-        display: flex;
-        align-items: center;
-        gap: 28rpx;
-        padding: 36rpx 40rpx;
-        border-bottom: 2rpx solid $color-border;
-
-        &:last-child {
-            border-bottom: none;
-        }
-
-        .action-icon {
-            width: 72rpx;
-            height: 72rpx;
-            border-radius: 16rpx;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .action-info {
-            flex: 1;
-        }
-        .action-t1 {
-            font-size: 28rpx;
-            font-weight: 600;
-            color: $color-primary;
-        }
-        .action-t2 {
-            font-size: 22rpx;
-            color: $color-muted;
-            margin-top: 4rpx;
-        }
-    }
+.tc-code {
+    font-size: 72rpx;
+    font-weight: 800;
+    color: $color-accent;
+    letter-spacing: 4rpx;
+    line-height: 1;
 }
-
-// 底部
-.footer {
+.tc-name {
+    font-size: 30rpx;
+    font-weight: 600;
+    color: $color-primary;
+}
+.tc-tags {
+    font-size: 24rpx;
+    color: $color-secondary;
+}
+.tc-empty-title {
+    font-size: 34rpx;
+    font-weight: 600;
+    color: $color-primary;
+}
+.tc-empty-desc {
+    font-size: 24rpx;
+    color: $color-secondary;
+    line-height: 1.6;
     text-align: center;
-    margin-top: 48rpx;
-    padding-bottom: $spacing-xs;
-    .footer-name {
-        font-size: 26rpx;
-        font-weight: 600;
-        color: $color-primary;
-    }
-    .footer-ver {
-        font-size: 20rpx;
-        color: #c0c4c0;
-        margin-top: 4rpx;
-        display: block;
-    }
+    width: 520rpx;
+}
+.tc-empty-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80rpx;
+    border-radius: $radius-btn;
+    background: $color-accent;
+    padding: 0 48rpx;
+}
+.tc-empty-btn-text {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: #ffffff;
 }
 
-.bottom-safe {
-    height: calc(180rpx + env(safe-area-inset-bottom));
+// ===== 统计区 =====
+// ===== 操作列表 =====
+.action-card {
+    background: $color-surface;
+    border: 2rpx solid $color-border;
+    border-radius: $radius-sm;
+    overflow: hidden;
+}
+.action-row {
+    display: flex;
+    align-items: center;
+    gap: 24rpx;
+    padding: 28rpx 32rpx;
+    border-bottom: 2rpx solid $color-border;
+}
+.action-row:last-child {
+    border-bottom: none;
+}
+.action-icon {
+    width: 72rpx;
+    height: 72rpx;
+    border-radius: 16rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.action-info {
+    flex: 1;
+}
+.action-t1 {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: $color-primary;
+}
+.action-t2 {
+    font-size: 22rpx;
+    color: $color-muted;
+    margin-top: 4rpx;
+}
+
+// ===== 底部 =====
+.footer-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8rpx;
+    padding: 40rpx 0 0;
+}
+.footer-name {
+    font-size: 26rpx;
+    font-weight: 600;
+    color: $color-primary;
+}
+.footer-ver {
+    font-size: 20rpx;
+    color: $color-muted;
 }
 </style>

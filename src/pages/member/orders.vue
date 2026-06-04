@@ -1,28 +1,29 @@
 <template>
     <view class="page-orders">
-        <view class="top-area" :style="{ paddingTop: statusBarHeight + 'px' }">
-            <view class="top-back" @click="goBack">
-                <uni-icons type="back" color="#1e3322" size="22" />
-            </view>
-            <text class="top-title">购买记录</text>
-            <view class="top-ph" />
+        <!-- 导航栏 -->
+        <view class="nav" :style="{ paddingTop: statusBarHeight + 'px' }">
+            <text class="nav-back" @click="goBack">返回</text>
+            <text class="nav-title">购买记录</text>
+            <text class="nav-ph">返回</text>
         </view>
 
         <scroll-view scroll-y class="scroll-area">
             <view class="scroll-inner">
                 <!-- 空态 -->
-                <view v-if="loading" class="empty-state">
+                <view v-if="loading" class="empty-wrap">
                     <text class="empty-text">加载中...</text>
                 </view>
 
-                <view v-else-if="list.length === 0" class="empty-state">
-                    <view class="empty-icon">📋</view>
+                <view v-else-if="list.length === 0" class="empty-wrap">
+                    <view class="empty-icon">
+                        <uni-icons type="list" color="#2d6b3f" size="28" />
+                    </view>
                     <text class="empty-t1">暂无购买记录</text>
                     <text class="empty-t2">去购买次数后，记录会显示在这里</text>
                 </view>
 
                 <template v-else>
-                    <!-- 累计 -->
+                    <!-- 累计消费 -->
                     <view class="total-row">
                         <text class="total-label">累计消费</text>
                         <text class="total-amount">¥{{ totalAmount }}</text>
@@ -32,7 +33,7 @@
                     <view v-for="(group, gi) in groupedList" :key="gi" class="month-group">
                         <text class="month-label">{{ group.month }}</text>
                         <view v-for="(item, idx) in group.items" :key="idx" class="order-row">
-                            <view class="order-dot" :class="item.status === 'completed' ? 'green' : ''" />
+                            <view class="order-dot" />
                             <view class="order-body">
                                 <view class="order-top">
                                     <text class="order-name">{{ productName(item.product) }}</text>
@@ -69,12 +70,10 @@ function statusText(s) {
     return statusTexts[s] || s || '—'
 }
 
-// 累计消费
 const totalAmount = computed(() => {
     return list.value.reduce((s, o) => s + Number(o.price || 0), 0).toFixed(1)
 })
 
-// 按月分组
 const groupedList = computed(() => {
     const map = {}
     for (const o of list.value) {
@@ -111,170 +110,157 @@ const goBack = () => uni.navigateBack()
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background-color: $color-surface;
+    background: $color-bg;
     overflow: hidden;
 }
 
-// 导航
-.top-area {
+// ===== 导航栏 =====
+.nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 48rpx 28rpx;
+    height: 88rpx;
+    padding: 0 40rpx;
+    background: $color-surface;
     border-bottom: 2rpx solid $color-border;
+}
+.nav-back {
+    font-size: 28rpx;
+    color: $color-secondary;
+    width: 100rpx;
     flex-shrink: 0;
-
-    .top-back {
-        width: 64rpx;
-    }
-    .top-title {
-        font-size: 34rpx;
-        font-weight: 600;
-        color: $color-primary;
-    }
-    .top-ph {
-        width: 64rpx;
-    }
+}
+.nav-title {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: $color-primary;
+}
+.nav-ph {
+    font-size: 28rpx;
+    color: transparent;
+    width: 100rpx;
+    flex-shrink: 0;
 }
 
+// ===== Scroll =====
 .scroll-area {
     flex: 1;
     height: 0;
     overflow: hidden;
 }
 .scroll-inner {
-    padding: 40rpx 48rpx 48rpx;
+    padding: 40rpx 40rpx 60rpx 40rpx;
 }
 
-// 空态
-.empty-state {
+// ===== 空态 =====
+.empty-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding-top: 40vh;
-
-    .empty-icon {
-        width: 112rpx;
-        height: 112rpx;
-        background: #f5f5f5;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 32rpx;
-        font-size: 48rpx;
-    }
-    .empty-t1 {
-        font-size: 32rpx;
-        font-weight: 600;
-        color: $color-primary;
-    }
-    .empty-t2 {
-        font-size: 26rpx;
-        color: #bbb;
-        margin-top: 12rpx;
-    }
-    .empty-text {
-        font-size: 26rpx;
-        color: $color-muted;
-    }
+    gap: 16rpx;
+}
+.empty-icon {
+    width: 112rpx;
+    height: 112rpx;
+    border-radius: 56rpx;
+    background: $color-accent-bg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.empty-t1 {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: $color-primary;
+}
+.empty-t2 {
+    font-size: 24rpx;
+    color: $color-muted;
+}
+.empty-text {
+    font-size: 26rpx;
+    color: $color-muted;
 }
 
-// 累计
+// ===== 累计消费 =====
 .total-row {
     display: flex;
-    align-items: baseline;
-    gap: 16rpx;
-    margin-bottom: 56rpx;
-
-    .total-label {
-        font-size: 28rpx;
-        color: #999;
-    }
-    .total-amount {
-        font-size: 56rpx;
-        font-weight: 700;
-        color: $color-primary;
-    }
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 0 32rpx 0;
+}
+.total-label {
+    font-size: 26rpx;
+    color: $color-muted;
+}
+.total-amount {
+    font-size: 56rpx;
+    font-weight: 700;
+    color: $color-primary;
 }
 
-// 月份组
+// ===== 月份组 =====
 .month-group {
-    margin-bottom: 48rpx;
-    &:last-child {
-        margin-bottom: 0;
-    }
+    margin-bottom: 24rpx;
 }
-
 .month-label {
     display: block;
-    font-size: 26rpx;
+    font-size: 24rpx;
     font-weight: 600;
-    color: #999;
-    margin-bottom: 24rpx;
-    letter-spacing: 1rpx;
+    color: $color-muted;
+    padding: 16rpx 0 24rpx 0;
 }
 
-// 订单行
+// ===== 订单行 =====
 .order-row {
     display: flex;
-    gap: 28rpx;
-    padding: 28rpx 0;
-    border-bottom: 2rpx solid #f2f2f2;
-
-    &:last-child {
-        border-bottom: none;
-    }
+    gap: 20rpx;
+    padding: 24rpx 0;
+    border-bottom: 2rpx solid $color-border;
 }
-
+.order-row:last-child {
+    border-bottom: none;
+}
 .order-dot {
     width: 16rpx;
     height: 16rpx;
-    border-radius: 50%;
-    background: #ddd;
-    margin-top: 12rpx;
+    border-radius: 8rpx;
+    background: $color-accent;
+    margin-top: 10rpx;
     flex-shrink: 0;
-
-    &.green {
-        background: $color-accent;
-    }
 }
-
 .order-body {
     flex: 1;
 }
-
 .order-top {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-
-    .order-name {
-        font-size: 30rpx;
-        font-weight: 600;
-        color: $color-primary;
-    }
-    .order-price {
-        font-size: 30rpx;
-        font-weight: 700;
-        color: $color-primary;
-    }
 }
-
+.order-name {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: $color-primary;
+}
+.order-price {
+    font-size: 28rpx;
+    font-weight: 700;
+    color: $color-primary;
+}
 .order-meta {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     margin-top: 8rpx;
-
-    .order-date {
-        font-size: 24rpx;
-        color: #bbb;
-    }
-    .order-status {
-        font-size: 24rpx;
-        color: $color-accent;
-    }
+}
+.order-date {
+    font-size: 22rpx;
+    color: $color-muted;
+}
+.order-status {
+    font-size: 22rpx;
+    font-weight: 500;
+    color: $color-accent;
 }
 </style>

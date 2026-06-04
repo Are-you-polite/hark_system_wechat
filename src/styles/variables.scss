@@ -1,19 +1,22 @@
 // === 颜色系统 ===
-$color-primary:    #1e3322;
-$color-secondary:  #6b7b6b;
-$color-muted:      #808a80;
-$color-accent:     #2d6b3f;
-$color-accent-dark:#235a33;
-$color-surface:    #ffffff;
+$color-primary: #1e3322;
+$color-secondary: #6b7b6b;
+$color-muted: #808a80;
+$color-accent: #2d6b3f;
+$color-accent-dark: #235a33;
+$color-accent-bg: #eaf3ec;
+$color-surface: #ffffff;
 $color-surface-secondary: #f4f5f5;
-$color-border:     #e5e8e5;
-$color-bg:         #fafafa;
+$color-border: #e5e8e5;
+$color-bg: #fafafa;
 
 // === 圆角 ===
+$radius-xs: 8rpx;
 $radius-sm: 12rpx;
 $radius-md: 16rpx;
 $radius-lg: 24rpx;
 $radius-xl: 32rpx;
+$radius-btn: 10rpx;
 
 // === 间距（8rpx 倍数） ===
 $spacing-xs: 8rpx;
