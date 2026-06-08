@@ -28,7 +28,7 @@ export const useUserStore = defineStore('user', () => {
     const inviterType = ref('')
     const inviterName = ref('')
     const pendingMatchInvite = ref(false) // 有邀请待处理（答题完成后弹窗）
-    const inviteHandled = ref(false) // 本会话已处理过邀请，防止重复
+    const freshInviteEntry = ref(false) // 本次打开是否从分享卡片进入（onShow 消费）
 
     const loading = ref(false)
 
@@ -151,7 +151,7 @@ export const useUserStore = defineStore('user', () => {
         inviterType,
         inviterName,
         pendingMatchInvite,
-        inviteHandled,
+        freshInviteEntry,
         nickName,
         avatarUrl,
         profileComplete,

@@ -71,7 +71,7 @@ function statusText(s) {
 }
 
 const totalAmount = computed(() => {
-    return list.value.reduce((s, o) => s + Number(o.price || 0), 0).toFixed(1)
+    return list.value.reduce((s, o) => s + Number(o.price || 0), 0).toFixed(2)
 })
 
 const groupedList = computed(() => {
@@ -91,7 +91,7 @@ onMounted(async () => {
     try {
         const res = await paymentApi.getList()
         if (res.code === 0) {
-            list.value = (res.data.orders || []).filter((o) => o.status !== 'pending')
+            list.value = (res.data.orders || []).filter((o) => o.status === 'completed')
         }
     } catch {
         /* ignore */

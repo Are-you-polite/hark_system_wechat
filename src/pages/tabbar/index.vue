@@ -9,6 +9,37 @@
             </view>
         </view>
         <InviteModal v-if="showInviteModal" :invite-state="inviteState" :inviter-name="inviterName" :inviter-avatar-url="inviterAvatarUrl" :match-id="matchedId" @close="showInviteModal = false" @match-done="onMatchDone" />
+
+        <!-- 补资料弹窗（放在 pages-container 外面，避免 transform 破坏 position: fixed） -->
+        <view v-if="showProfileForm" class="pfp-overlay" @click="closeProfileForm">
+            <view class="pfp-sheet" @click.stop>
+                <view class="pfp-handle" />
+                <text class="pfp-title">完善个人资料</text>
+                <text class="pfp-desc">设置昵称和头像，让好友认出你</text>
+
+                <view class="pfp-avatar-section">
+                    <button class="pfp-avatar-btn" open-type="chooseAvatar" @chooseavatar="onChooseAvatar">
+                        <image v-if="pfpAvatarUrl" :src="pfpAvatarUrl" class="pfp-avatar-img" mode="aspectFill" />
+                        <text v-else class="pfp-avatar-placeholder">{{ (mStore.nickName || '我')[0] }}</text>
+                        <view class="pfp-avatar-badge">
+                            <text class="pfp-edit-icon">✎</text>
+                        </view>
+                    </button>
+                    <text class="pfp-avatar-hint">点击选择微信头像</text>
+                </view>
+
+                <view class="pfp-input-section">
+                    <input v-model="pfpNickname" class="pfp-input" type="nickname" placeholder="你的微信昵称" maxlength="12" @blur="onNicknameBlur" />
+                </view>
+
+                <view class="pfp-btns">
+                    <view class="pfp-btn pfp-btn-cancel" @click="closeProfileForm">取消</view>
+                    <view class="pfp-btn pfp-btn-confirm" :class="{ disabled: !pfpNickname.trim() || pfpSaving }" @click="saveProfile">
+                        {{ pfpSaving ? '保存中...' : '确认' }}
+                    </view>
+                </view>
+            </view>
+        </view>
     </view>
     <view class="custom-tabbar">
         <view class="tabbar-list">
@@ -28,6 +59,7 @@ import tabMine from '@/components/tab-mine/index.vue'
 import InviteModal from '@/components/InviteModal.vue'
 import { useUserStore } from '@/stores/user'
 import { matchApi } from '@/api/match'
+import { userApi } from '@/api/user'
 
 const currentTab = ref('home')
 const mStore = useUserStore()
@@ -45,19 +77,28 @@ onShareAppMessage(() => {
 })
 
 onLoad((options) => {
-    if (options?.inviterId && !mStore.inviteHandled) {
+    if (options?.inviterId) {
         mStore.setInviter(options.inviterId, options.inviterType || '', options.inviterName ? decodeURIComponent(options.inviterName) : '')
-        mStore.inviteHandled = true
-        // 等待登录后拉取邀请信息
-        const timer = setInterval(async () => {
-            if (mStore.loggedIn) {
-                clearInterval(timer)
-                await loadInviteInfo()
-            }
-        }, 200)
-        setTimeout(() => clearInterval(timer), 10000)
+        waitForLoginAndProcessInvite()
     }
 })
+
+onShow(() => {
+    if (mStore.freshInviteEntry && mStore.inviterId && !showInviteModal.value) {
+        mStore.freshInviteEntry = false
+        waitForLoginAndProcessInvite()
+    }
+})
+
+function waitForLoginAndProcessInvite() {
+    const timer = setInterval(async () => {
+        if (mStore.loggedIn) {
+            clearInterval(timer)
+            await loadInviteInfo()
+        }
+    }, 200)
+    setTimeout(() => clearInterval(timer), 10000)
+}
 
 async function loadInviteInfo() {
     try {
@@ -88,6 +129,67 @@ function onMatchDone(matchId) {
     showInviteModal.value = false
     uni.redirectTo({ url: `/pages/match/result?matchId=${matchId}` })
 }
+
+// 补资料弹窗
+const showProfileForm = ref(false)
+const pfpNickname = ref('')
+const pfpAvatarUrl = ref('')
+const pfpSaving = ref(false)
+
+function openProfileForm() {
+    pfpNickname.value = mStore.nickName || ''
+    pfpAvatarUrl.value = mStore.avatarUrl || ''
+    showProfileForm.value = true
+}
+provide('openProfileForm', openProfileForm)
+
+function closeProfileForm() {
+    showProfileForm.value = false
+}
+
+async function onChooseAvatar(e) {
+    const tempUrl = e.detail.avatarUrl
+    if (!tempUrl) return
+    uni.showLoading({ title: '上传头像...' })
+    try {
+        const ext = tempUrl.match(/\.(\w+)(\?|$)/)?.[1] || 'jpg'
+        const cloudRes = await wx.cloud.uploadFile({
+            cloudPath: `avatars/${mStore.user?._id || Date.now()}_${Date.now()}.${ext}`,
+            filePath: tempUrl
+        })
+        pfpAvatarUrl.value = cloudRes.fileID
+    } catch {
+        pfpAvatarUrl.value = tempUrl
+    } finally {
+        uni.hideLoading()
+    }
+}
+
+function onNicknameBlur(e) {
+    const val = e.detail?.value
+    if (val) pfpNickname.value = val
+}
+
+async function saveProfile() {
+    const name = pfpNickname.value.trim()
+    if (!name || pfpSaving.value) return
+    pfpSaving.value = true
+    try {
+        const res = await userApi.updateProfile({ nickName: name, avatarUrl: pfpAvatarUrl.value })
+        if (res.code === 0) {
+            mStore.setProfile(res.data)
+            showProfileForm.value = false
+            uni.showToast({ title: '保存成功，再次点击即可分享', icon: 'success' })
+        } else {
+            uni.showToast({ title: res.message || '保存失败', icon: 'none' })
+        }
+    } catch {
+        uni.showToast({ title: '网络错误', icon: 'none' })
+    } finally {
+        pfpSaving.value = false
+    }
+}
+
 const tabsList = [
     { key: 'home', label: '档案', icon: 'calendar' },
     { key: 'chats', label: '对话', icon: 'chatboxes' },
@@ -171,5 +273,144 @@ const pageStyle = computed(() => {
             color: #ffffff;
         }
     }
+}
+
+/* ===== 补资料弹窗 ===== */
+.pfp-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+.pfp-sheet {
+    width: 100%;
+    background: $color-surface;
+    border-radius: $radius-xl $radius-xl 0 0;
+    padding: 16rpx 40rpx calc(40rpx + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.pfp-handle {
+    width: 48rpx;
+    height: 6rpx;
+    background: $color-border;
+    border-radius: 3rpx;
+    margin-bottom: 32rpx;
+    flex-shrink: 0;
+}
+.pfp-title {
+    font-size: 36rpx;
+    font-weight: 700;
+    color: $color-primary;
+    margin-bottom: 8rpx;
+}
+.pfp-desc {
+    font-size: 26rpx;
+    color: $color-secondary;
+    margin-bottom: 40rpx;
+}
+.pfp-avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40rpx;
+    width: 100%;
+}
+.pfp-avatar-btn {
+    width: 140rpx;
+    height: 140rpx;
+    border-radius: 50%;
+    padding: 0;
+    margin: 0;
+    background: $color-accent-bg;
+    border: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+.pfp-avatar-btn::after {
+    border: none;
+}
+.pfp-avatar-img {
+    width: 140rpx;
+    height: 140rpx;
+    border-radius: 50%;
+}
+.pfp-avatar-placeholder {
+    font-size: 48rpx;
+    font-weight: 700;
+    color: $color-accent;
+}
+.pfp-avatar-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 40rpx;
+    height: 40rpx;
+    border-radius: 50%;
+    background: $color-accent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4rpx solid $color-surface;
+}
+.pfp-edit-icon {
+    font-size: 24rpx;
+    color: #ffffff;
+    line-height: 1;
+}
+.pfp-avatar-hint {
+    font-size: 22rpx;
+    color: $color-muted;
+    margin-top: 16rpx;
+}
+.pfp-input-section {
+    width: 100%;
+    margin-bottom: 40rpx;
+}
+.pfp-input {
+    width: 100%;
+    padding: 24rpx 32rpx;
+    background: $color-surface-secondary;
+    border: 2rpx solid $color-border;
+    border-radius: $radius-sm;
+    font-size: 30rpx;
+    color: $color-primary;
+    text-align: center;
+    box-sizing: border-box;
+    min-height: 80rpx;
+}
+.pfp-input::placeholder {
+    color: $color-muted;
+}
+.pfp-btns {
+    display: flex;
+    gap: 16rpx;
+    width: 100%;
+}
+.pfp-btn {
+    flex: 1;
+    padding: 24rpx 0;
+    border-radius: $radius-sm;
+    font-size: 30rpx;
+    font-weight: 600;
+    text-align: center;
+}
+.pfp-btn-cancel {
+    background: $color-surface-secondary;
+    color: $color-secondary;
+}
+.pfp-btn-confirm {
+    background: $color-accent;
+    color: #ffffff;
+}
+.pfp-btn-confirm.disabled {
+    opacity: 0.4;
 }
 </style>

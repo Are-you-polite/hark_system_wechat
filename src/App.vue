@@ -19,8 +19,9 @@ onShow((options) => {
     const store = useUserStore()
 
     const query = options?.query || {}
-    if (query.inviterId && !store.inviteHandled) {
+    if (query.inviterId) {
         store.setInviter(query.inviterId, query.inviterType || '', query.inviterName ? decodeURIComponent(query.inviterName) : '')
+        store.freshInviteEntry = true
     }
 
     if (store.loggedIn) {
